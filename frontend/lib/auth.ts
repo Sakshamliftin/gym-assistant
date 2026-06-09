@@ -1,6 +1,7 @@
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db";
+import bcrypt from "bcryptjs";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -24,32 +25,14 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user) {
-          const email = credentials.email.includes("@") ? credentials.email.toLowerCase() : `${credentials.email.toLowerCase()}@gymbuddy.com`;
-          const username = credentials.email.includes("@") ? credentials.email.split("@")[0].toLowerCase() : credentials.email.toLowerCase();
+          // User doesn't exist, must signup first
+          return null;
+        }
 
-          // Ensure username uniqueness
-          const existingUsername = await prisma.user.findUnique({
-            where: { username }
-          });
-          const finalUsername = existingUsername ? `${username}_${Math.floor(Math.random() * 1000)}` : username;
-
-          user = await prisma.user.create({
-            data: {
-              email,
-              username: finalUsername,
-              name: finalUsername,
-              password: credentials.password,
-              profile: {
-                create: {
-                  onboardingDone: false
-                }
-              }
-            }
-          });
-        } else {
-          if (user.password !== credentials.password) {
-            return null;
-          }
+        const isMatch = await bcrypt.compare(credentials.password, user.password);
+        // Fallback to plain text check to ensure existing demo users still work
+        if (!isMatch && user.password !== credentials.password) {
+          return null;
         }
 
         return {

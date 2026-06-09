@@ -26,7 +26,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password. Try saksham@gmail.com / 1234");
+      setError("Invalid email or password. If you don't have an account, please sign up first.");
     } else {
       router.push("/dashboard");
       router.refresh();

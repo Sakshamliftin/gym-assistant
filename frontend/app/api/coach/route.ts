@@ -29,20 +29,35 @@ export async function POST(req: NextRequest) {
     }
   });
 
+  // Check if profile is filled in
+  const hasProfile = profile && (profile.fitnessGoal || profile.age || profile.experienceLevel);
+
   // Construct context string
-  const context = `
-You are an expert AI fitness coach for this user.
-Profile Context:
-- Age: ${profile?.age || 'Unknown'}
-- Gender: ${profile?.gender || 'Unknown'}
-- Goal: ${profile?.fitnessGoal || 'Unknown'}
-- Experience: ${profile?.experienceLevel || 'Unknown'}
-- Medical Notes: ${profile?.medicalNotes || 'None'}
+  const context = hasProfile
+    ? `
+You are an expert AI fitness coach for this user. You already know their profile — do NOT ask them for information you already have.
 
-Recent Workouts Context (last 3):
-${recentWorkouts.map(w => `- ${w.name}: ${w.exercises.map(we => we.exercise.name).join(", ")}`).join('\n')}
+User Profile:
+- Age: ${profile.age ?? 'Not specified'}
+- Gender: ${profile.gender ?? 'Not specified'}
+- Fitness Goal: ${profile.fitnessGoal ?? 'Not specified'}
+- Experience Level: ${profile.experienceLevel ?? 'Not specified'}
+- Workout Frequency: ${profile.workoutFrequency ? `${profile.workoutFrequency}x per week` : 'Not specified'}
+- Height: ${profile.heightCm ? `${profile.heightCm} cm` : 'Not specified'}
+- Weight: ${profile.weightKg ? `${profile.weightKg} kg` : 'Not specified'}
+- Medical Notes: ${profile.medicalNotes || 'None'}
 
-Based on this context, provide helpful, concise, and safe fitness advice.
+Recent Workouts (last 3):
+${recentWorkouts.length > 0
+  ? recentWorkouts.map(w => `- ${w.name}: ${w.exercises.map(we => we.exercise.name).join(", ")}`).join('\n')
+  : 'No recent workouts logged yet.'}
+
+Use the profile data above to give personalised, specific, and concise fitness advice. Reference their goal and experience level naturally in your response.
+`
+    : `
+You are a friendly AI fitness coach. This user has not completed their profile setup yet.
+Kindly let them know that to give personalised advice, they should complete their fitness profile first by visiting the Onboarding page (they can find an "Edit Profile" link on their dashboard).
+You can still answer general fitness questions, but make it clear the advice is generic since you don't know their specific goals or experience.
 `;
 
   try {

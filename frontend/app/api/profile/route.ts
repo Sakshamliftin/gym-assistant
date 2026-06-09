@@ -40,8 +40,6 @@ export async function PATCH(request: NextRequest) {
   } = body;
 
   try {
-    // TEMPORARY BYPASS: Commenting out DB check so user can proceed
-    /*
     const profile = await prisma.profile.upsert({
       where: { userId: session.user.id },
       create: {
@@ -71,10 +69,8 @@ export async function PATCH(request: NextRequest) {
         onboardingDone: onboardingDone ?? undefined,
       },
     });
-    */
 
-    // Return dummy success
-    return NextResponse.json({ profile: { onboardingDone: true } });
+    return NextResponse.json({ profile });
   } catch (error: any) {
     console.error("Profile Upsert Error:", error);
     return NextResponse.json({ error: error.message || "Failed to upsert profile" }, { status: 500 });

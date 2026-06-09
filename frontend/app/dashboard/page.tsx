@@ -23,8 +23,15 @@ export default async function DashboardPage() {
     return <SessionResetRedirect />;
   }
 
-  // Dummy profile for display
-  const profile = { onboardingDone: true, bypass: true };
+  // Fetch real profile
+  const profile = await prisma.profile.findUnique({
+    where: { userId: session.user.id }
+  });
+
+  // Redirect to onboarding if not yet complete
+  if (!profile?.onboardingDone) {
+    redirect("/onboarding");
+  }
 
   // 1. Fetch subscriptions & posts
   let subscriptions = await prisma.subscription.findMany({
@@ -275,24 +282,26 @@ export default async function DashboardPage() {
             {/* Profile Summary */}
             <div style={{ padding: "1.5rem", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "1rem" }}>
               <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "1rem" }}>
-                Your Profile Summary
+                Your Profile
               </h2>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginBottom: "1rem", lineHeight: 1.5 }}>
-                Your current onboarding parameters and bypass states.
-              </p>
-              <pre
-                style={{
-                  background: "var(--bg-elevated)",
-                  padding: "1rem",
-                  borderRadius: "0.5rem",
-                  fontSize: "0.75rem",
-                  overflowX: "auto",
-                  color: "var(--text-primary)",
-                  border: "1px solid var(--border)"
-                }}
-              >
-                {JSON.stringify(profile, null, 2)}
-              </pre>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                {[
+                  { label: "Goal", value: profile?.fitnessGoal?.replace("-", " ") },
+                  { label: "Experience", value: profile?.experienceLevel },
+                  { label: "Age", value: profile?.age ? `${profile.age} yrs` : null },
+                  { label: "Weight", value: profile?.weightKg ? `${profile.weightKg} kg` : null },
+                  { label: "Height", value: profile?.heightCm ? `${profile.heightCm} cm` : null },
+                  { label: "Training Days", value: profile?.workoutFrequency ? `${profile.workoutFrequency}x / week` : null },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", padding: "0.5rem 0", borderBottom: "1px solid var(--border-subtle)" }}>
+                    <span style={{ color: "var(--text-muted)" }}>{label}</span>
+                    <span style={{ color: "var(--text-primary)", fontWeight: 500, textTransform: "capitalize" }}>{value || "—"}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/onboarding" style={{ display: "block", marginTop: "1rem", fontSize: "0.8125rem", color: "var(--accent)", textDecoration: "none", textAlign: "center" }}>
+                ✏️ Edit Profile
+              </Link>
             </div>
           </div>
         </div>
