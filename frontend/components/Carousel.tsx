@@ -32,7 +32,7 @@ export default function Carousel() {
     return () => clearInterval(timer);
   }, [curIndex]);
   return (
-    <div className="relative w-full flex justify-center h-150 group">
+    <div className="relative w-full overflow-hidden h-150 group">
       {/* slides container */}
       <div
         className="flex h-full w-full transition-transform duration-500 ease-out"

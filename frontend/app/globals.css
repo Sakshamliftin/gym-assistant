@@ -138,3 +138,27 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
 }
+
+/* ── Navbar Links ───────────────────────────────────────────── */
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: color 0.2s, transform 0.2s;
+}
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-link-signin {
+  padding: 0.5rem 1.25rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link-signin:hover {
+  color: var(--text-primary);
+}

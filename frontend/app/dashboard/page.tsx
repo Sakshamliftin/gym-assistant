@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Carousel from "@/components/Carousel";
+import Footer from "@/components/Footer";
+import SessionResetRedirect from "@/components/SessionResetRedirect";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -12,60 +14,292 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  /* TEMPORARY BYPASS
-  const profile = await prisma.profile.findUnique({
-    where: { userId: session.user.id },
+  // Ensure the user exists in the database
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id }
   });
 
-  if (!profile?.onboardingDone) {
-    redirect("/onboarding");
+  if (!dbUser) {
+    return <SessionResetRedirect />;
   }
-  */
+
   // Dummy profile for display
   const profile = { onboardingDone: true, bypass: true };
 
-  return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Dashboard</h1>
-      <p>Welcome back, {session.user.name || session.user.email}!</p>
-      <Carousel/>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>Quick Actions</h2>
-        <ul style={{ listStyle: "none", padding: 0, display: "flex", gap: "1rem" }}>
-          <li>
-            <Link href="/workouts/new" className="btn-primary">
-              Start Workout
-            </Link>
-          </li>
-          <li>
-            <Link href="/coach" className="btn-secondary">
-              🤖 Ask AI Coach
-            </Link>
-          </li>
-          <li>
-            <Link href="/community" className="btn-secondary">
-              🌍 Community
-            </Link>
-          </li>
-          <li>
-            <Link href="/messages" className="btn-secondary">
-              ✉️ Messages
-            </Link>
-          </li>
-          <li>
-            <Link href="/history" className="btn-secondary">
-              History
-            </Link>
-          </li>
-        </ul>
-      </div>
+  // 1. Fetch subscriptions & posts
+  let subscriptions = await prisma.subscription.findMany({
+    where: { userId: session.user.id },
+    include: {
+      creator: {
+        include: {
+          posts: {
+            orderBy: { createdAt: "desc" },
+          }
+        }
+      }
+    }
+  });
 
-      <div style={{ marginTop: "2rem" }}>
-        <h2>Your Profile Summary</h2>
-        <pre style={{ background: "var(--bg-elevated)", padding: "1rem", borderRadius: "0.5rem" }}>
-          {JSON.stringify(profile, null, 2)}
-        </pre>
+  // 2. Seed demo data if user has no subscriptions
+  if (subscriptions.length === 0) {
+    let creators = await prisma.creator.findMany();
+    
+    if (creators.length === 0) {
+      const creatorUsersData = [
+        {
+          email: "coach_alex@gymbuddy.com",
+          name: "Alex Mercer",
+          displayName: "Alex Mercer (Strength Coach)",
+          bio: "Elite Powerlifter & Strength Coach. Teaching you the art of the heavy squat and deadlift."
+        },
+        {
+          email: "sarah_fit@gymbuddy.com",
+          name: "Sarah Jenkins",
+          displayName: "Sarah Jenkins (HIIT & Mobility)",
+          bio: "Yoga therapist & HIIT instructor. Helping you move better and build functional strength."
+        },
+        {
+          email: "nutrition_guru@gymbuddy.com",
+          name: "David Vance",
+          displayName: "David Vance (Nutritionist)",
+          bio: "Registered dietitian. Clean eating, macro tracking, and meal prep made simple."
+        }
+      ];
+
+      for (const cu of creatorUsersData) {
+        // Create user
+        const user = await prisma.user.create({
+          data: {
+            email: cu.email,
+            name: cu.name,
+            username: cu.email.split("@")[0],
+            password: "democreatorpass",
+          }
+        });
+        // Create creator
+        const creator = await prisma.creator.create({
+          data: {
+            userId: user.id,
+            displayName: cu.displayName,
+            bio: cu.bio,
+          }
+        });
+        // Create posts
+        if (cu.email.includes("alex")) {
+          await prisma.post.createMany({
+            data: [
+              {
+                creatorId: creator.id,
+                title: "Mastering the Squat Depth",
+                content: "Squat depth is determined by your hip and ankle mobility. Try holding a deep goblet squat stretch for 30s before your next leg day to warm up your hip capsules!"
+              },
+              {
+                creatorId: creator.id,
+                title: "The 5-3-1 Method for Power",
+                content: "If your bench press is stalling, shift to a block-periodized 5-3-1 cycle. Focus on submaximal load speed rather than grinding out failure sets every single week."
+              }
+            ]
+          });
+        } else if (cu.email.includes("sarah")) {
+          await prisma.post.createMany({
+            data: [
+              {
+                creatorId: creator.id,
+                title: "10 Min Morning Mobility Flow",
+                content: "Start your day with: 1. Cat-Cow (10 reps), 2. World's Greatest Stretch (5 per side), 3. Deep Squat to hamstring stretch (8 reps). Your joints will thank you!"
+              },
+              {
+                creatorId: creator.id,
+                title: "Hydration & Recovery",
+                content: "Muscle soreness (DOMS) is heavily amplified by dehydration. Aim for at least 3.5 liters of water daily, and make sure you're getting sodium and magnesium post-workout."
+              }
+            ]
+          });
+        } else {
+          await prisma.post.createMany({
+            data: [
+              {
+                creatorId: creator.id,
+                title: "The Truth About Protein Spacing",
+                content: "Your body can absorb protein all day, but muscle protein synthesis is optimized when you space out protein intake into 30-40g boluses every 3 to 4 hours."
+              },
+              {
+                creatorId: creator.id,
+                title: "Easy Meal Prep: Lemon Herb Chicken",
+                content: "Prep 4 meals in 20 mins: Dice 600g chicken breast, season with garlic powder, oregano, lemon juice, salt, and pepper. Sear in olive oil. Serve with 150g jasmine rice and roasted broccoli!"
+              }
+            ]
+          });
+        }
+      }
+      creators = await prisma.creator.findMany();
+    }
+
+    // Subscribe user to these creators
+    for (const creator of creators) {
+      await prisma.subscription.create({
+        data: {
+          userId: session.user.id,
+          creatorId: creator.id
+        }
+      }).catch(() => {});
+    }
+
+    // Re-fetch subscriptions
+    subscriptions = await prisma.subscription.findMany({
+      where: { userId: session.user.id },
+      include: {
+        creator: {
+          include: {
+            posts: {
+              orderBy: { createdAt: "desc" },
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // 3. Flatten and sort posts
+  const posts = subscriptions
+    .flatMap((sub) =>
+      sub.creator.posts.map((post) => ({
+        ...post,
+        creator: sub.creator
+      }))
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return (
+    <div style={{ background: "var(--bg-base)", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, padding: "2rem 1.5rem", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+        {/* Welcome Section */}
+        <div style={{ marginBottom: "2rem" }}>
+          <h1 style={{ fontSize: "2.25rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "0.25rem" }}>
+            Dashboard
+          </h1>
+          <p style={{ color: "var(--text-secondary)" }}>
+            Welcome back, <strong style={{ color: "var(--text-primary)" }}>{session.user.name || session.user.email}</strong>! Here is your training summary and feed.
+          </p>
+        </div>
+
+        {/* Carousel / Banner */}
+        <div style={{ borderRadius: "1rem", overflow: "hidden", marginBottom: "2.5rem", border: "1px solid var(--border-subtle)" }}>
+          <Carousel />
+        </div>
+
+        {/* Main Columns */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2rem" }} className="dashboard-grid">
+          {/* Custom style helper for responsive layouts */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            @media (min-width: 900px) {
+              .dashboard-grid {
+                grid-template-columns: 1.8fr 1.2fr !important;
+              }
+            }
+          ` }} />
+
+          {/* Left Column: Community Feed */}
+          <div>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "1.25rem" }}>
+              Your Feed
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              {posts.length === 0 ? (
+                <div style={{ padding: "3rem", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "1rem", textAlign: "center" }}>
+                  <p style={{ color: "var(--text-muted)" }}>No updates from your subscribed communities yet.</p>
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <article
+                    key={post.id}
+                    style={{
+                      background: "var(--bg-surface)",
+                      border: "1px solid var(--border-subtle)",
+                      borderRadius: "1rem",
+                      padding: "1.5rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.75rem",
+                      transition: "transform 0.2s, box-shadow 0.2s"
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontWeight: 600, color: "var(--accent)", fontSize: "0.875rem" }}>
+                        {post.creator.displayName}
+                      </span>
+                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                        {new Date(post.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      </span>
+                    </div>
+                    {post.title && (
+                      <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                        {post.title}
+                      </h3>
+                    )}
+                    <p style={{ color: "var(--text-secondary)", lineHeight: 1.6, fontSize: "0.9375rem", whiteSpace: "pre-wrap" }}>
+                      {post.content}
+                    </p>
+                  </article>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Actions & Summary */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            {/* Quick Actions */}
+            <div style={{ padding: "1.5rem", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "1rem" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "1.25rem" }}>
+                Quick Actions
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <Link href="/workouts/new" className="btn-primary" style={{ width: "100%", textAlign: "center" }}>
+                  🏋️ Start Workout
+                </Link>
+                <Link href="/coach" className="btn-secondary" style={{ width: "100%", textAlign: "center" }}>
+                  🤖 Ask AI Coach
+                </Link>
+                <Link href="/community" className="btn-secondary" style={{ width: "100%", textAlign: "center" }}>
+                  🌍 Explore Communities
+                </Link>
+                <Link href="/messages" className="btn-secondary" style={{ width: "100%", textAlign: "center" }}>
+                  ✉️ Messages
+                </Link>
+                <Link href="/history" className="btn-secondary" style={{ width: "100%", textAlign: "center" }}>
+                  📈 Workout History
+                </Link>
+              </div>
+            </div>
+
+            {/* Profile Summary */}
+            <div style={{ padding: "1.5rem", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "1rem" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "1rem" }}>
+                Your Profile Summary
+              </h2>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginBottom: "1rem", lineHeight: 1.5 }}>
+                Your current onboarding parameters and bypass states.
+              </p>
+              <pre
+                style={{
+                  background: "var(--bg-elevated)",
+                  padding: "1rem",
+                  borderRadius: "0.5rem",
+                  fontSize: "0.75rem",
+                  overflowX: "auto",
+                  color: "var(--text-primary)",
+                  border: "1px solid var(--border)"
+                }}
+              >
+                {JSON.stringify(profile, null, 2)}
+              </pre>
+            </div>
+          </div>
+        </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

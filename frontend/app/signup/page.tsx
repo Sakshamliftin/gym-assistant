@@ -7,6 +7,7 @@ import Link from "next/link";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,23 +19,38 @@ export default function SignupPage() {
     setError("");
     setLoading(true);
 
-    // For now, try to sign in with demo credentials
-    // Real registration will be wired in Milestone 2 with Prisma
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, username, email, password }),
+      });
+      const data = await res.json();
 
-    setLoading(false);
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
+        setLoading(false);
+        return;
+      }
 
-    if (result?.error) {
-      setError(
-        "Registration is not available yet — use the demo account: saksham@gmail.com / 1234"
-      );
-    } else {
-      router.push("/onboarding");
-      router.refresh();
+      // Automatically sign in
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      setLoading(false);
+
+      if (result?.error) {
+        setError("Account created, but automatic sign-in failed. Please sign in manually.");
+      } else {
+        router.push("/onboarding");
+        router.refresh();
+      }
+    } catch (err) {
+      setError("Failed to create account. Please check your connection.");
+      setLoading(false);
     }
   };
 
@@ -67,6 +83,21 @@ export default function SignupPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Your name"
+                className="w-full px-4 py-3 rounded-lg bg-[#27272a] border border-[#3f3f46] text-white placeholder-gray-500 focus:outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff] transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Username
+              </label>
+              <input
+                id="signup-username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                placeholder="unique_username"
                 className="w-full px-4 py-3 rounded-lg bg-[#27272a] border border-[#3f3f46] text-white placeholder-gray-500 focus:outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff] transition"
               />
             </div>

@@ -13,28 +13,51 @@ export const authOptions: AuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Since we are using a DB now, ensure the user exists
-        let user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+        // Find user by email or username
+        let user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: credentials.email.toLowerCase() },
+              { username: credentials.email.toLowerCase() }
+            ]
+          },
         });
 
-        // If user doesn't exist, auto-create them for this demo
         if (!user) {
+          const email = credentials.email.includes("@") ? credentials.email.toLowerCase() : `${credentials.email.toLowerCase()}@gymbuddy.com`;
+          const username = credentials.email.includes("@") ? credentials.email.split("@")[0].toLowerCase() : credentials.email.toLowerCase();
+
+          // Ensure username uniqueness
+          const existingUsername = await prisma.user.findUnique({
+            where: { username }
+          });
+          const finalUsername = existingUsername ? `${username}_${Math.floor(Math.random() * 1000)}` : username;
+
           user = await prisma.user.create({
             data: {
-              email: credentials.email,
-              name: credentials.email.split("@")[0],
-              password: credentials.password, // In a real app, hash this!
-            },
+              email,
+              username: finalUsername,
+              name: finalUsername,
+              password: credentials.password,
+              profile: {
+                create: {
+                  onboardingDone: false
+                }
+              }
+            }
           });
         } else {
-          // In a real app, compare hashed passwords here
           if (user.password !== credentials.password) {
             return null;
           }
         }
 
-        return { id: user.id, name: user.name, email: user.email };
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+        };
       },
     }),
   ],
@@ -51,12 +74,14 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.username = token.username as string;
       }
       return session;
     },

@@ -3,17 +3,27 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
-// GET /api/messages — Fetch inbox (received messages)
+// GET /api/messages — Fetch all chats (sent and received messages)
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const messages = await prisma.message.findMany({
-    where: { receiverId: session.user.id },
-    orderBy: { createdAt: "desc" },
+    where: {
+      OR: [
+        { senderId: session.user.id },
+        { receiverId: session.user.id }
+      ]
+    },
+    orderBy: { createdAt: "asc" },
     include: {
       sender: {
-        select: { name: true, email: true }
+        select: { id: true, name: true, username: true, email: true }
+      },
+      receiver: {
+        select: { id: true, name: true, username: true, email: true }
       }
     }
   });
@@ -21,24 +31,41 @@ export async function GET() {
   return NextResponse.json({ messages });
 }
 
-// POST /api/messages — Send a message by receiver email
+// POST /api/messages — Send a message by receiver username
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const { email, content } = await req.json();
-
-  if (!email || !content) {
-    return NextResponse.json({ error: "Recipient email and content are required." }, { status: 400 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Find recipient by email
+  const { username, content } = await req.json();
+
+  if (!username || !content) {
+    return NextResponse.json(
+      { error: "Recipient username and content are required." },
+      { status: 400 }
+    );
+  }
+
+  const targetUsername = username.trim().toLowerCase();
+
+  // Find recipient by username
   const receiver = await prisma.user.findUnique({
-    where: { email }
+    where: { username: targetUsername }
   });
 
   if (!receiver) {
-    return NextResponse.json({ error: "User with that email not found." }, { status: 404 });
+    return NextResponse.json(
+      { error: "User with that username not found." },
+      { status: 404 }
+    );
+  }
+
+  if (receiver.id === session.user.id) {
+    return NextResponse.json(
+      { error: "You cannot message yourself." },
+      { status: 400 }
+    );
   }
 
   const message = await prisma.message.create({
@@ -46,6 +73,14 @@ export async function POST(req: NextRequest) {
       senderId: session.user.id,
       receiverId: receiver.id,
       content,
+    },
+    include: {
+      sender: {
+        select: { id: true, name: true, username: true, email: true }
+      },
+      receiver: {
+        select: { id: true, name: true, username: true, email: true }
+      }
     }
   });
 

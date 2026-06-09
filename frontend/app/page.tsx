@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FeaturesGrid from "@/components/FeaturesGrid";
+import Footer from "@/components/Footer";
 
 const stats = [
   { value: "10k+", label: "Workouts logged" },
@@ -192,28 +193,99 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────────── */}
-      <footer style={{
-        borderTop: "1px solid var(--border-subtle)",
-        padding: "2rem 1.5rem", textAlign: "center",
-        color: "var(--text-muted)", fontSize: "0.875rem",
+      {/* ── FAQ Section ───────────────────────────────────────── */}
+      <section style={{
+        padding: "6rem 1.5rem",
+        maxWidth: "800px",
+        margin: "0 auto",
+        borderTop: "1px solid var(--border-subtle)"
       }}>
-        <div style={{
-          maxWidth: "1200px", margin: "0 auto",
-          display: "flex", justifyContent: "space-between",
-          alignItems: "center", flexWrap: "wrap", gap: "1rem",
-        }}>
-          <span>
-            <strong style={{ color: "var(--text-secondary)" }}>GymBuddy</strong> — Train smarter.
-          </span>
-          <div style={{ display: "flex", gap: "1.5rem" }}>
-            <Link href="/login" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Login</Link>
-            <Link href="/signup" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Sign Up</Link>
-            <Link href="/#features" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Features</Link>
-          </div>
-          <span>© 2026 GymBuddy</span>
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <h2 style={{
+            fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
+            fontWeight: 800,
+            letterSpacing: "-0.02em",
+            color: "var(--text-primary)",
+            marginBottom: "1rem"
+          }}>
+            Frequently Asked <span className="gradient-text">Questions</span>
+          </h2>
+          <p style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
+            Got questions? We've got answers. Everything you need to know about GymBuddy.
+          </p>
         </div>
-      </footer>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {[
+            {
+              q: "How does the AI Fitness Coach work?",
+              a: "The AI coach analyzes your personal profile (age, goals, medical history) and your last 3 workouts. When you ask a question, it responds with context-aware, personalized training and nutrition advice tailored exactly to your progress."
+            },
+            {
+              q: "Is my workout data secure?",
+              a: "Absolutely. Your privacy is our top priority. Your workout logs and profile details are encrypted and securely stored. We never share your personal data with third parties."
+            },
+            {
+              q: "Can I track custom workouts and exercises?",
+              a: "Yes! You can create custom routines, log individual exercises, and adjust sets, reps, and weights dynamically. GymBuddy is highly flexible and adapts to your style of training."
+            },
+            {
+              q: "Do I need a gym membership to use GymBuddy?",
+              a: "Not at all. GymBuddy works perfectly for home workouts, bodyweight training (calisthenics), resistance band training, and fully equipped commercial gym routines."
+            },
+            {
+              q: "How accurate is the PR detection?",
+              a: "Our algorithm automatically tracks your historical weights and rep volume. When you beat a personal record, GymBuddy instantly detects it and highlights it on your history, ensuring high accuracy."
+            },
+            {
+              q: "Can I connect with other gym-goers?",
+              a: "Yes! The Community tab lets you join groups, see public training logs, share tips, ask questions, and motivate fellow athletes on their fitness journeys."
+            },
+            {
+              q: "Is GymBuddy free to use?",
+              a: "GymBuddy offers a robust free tier that allows you to log workouts, check your history, and consult your AI Coach. We also offer premium features for advanced analytics."
+            }
+          ].map((faq, idx) => (
+            <details
+              key={idx}
+              style={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+                borderRadius: "1rem",
+                padding: "1.25rem",
+                cursor: "pointer",
+                transition: "all 0.2s"
+              }}
+            >
+              <summary style={{
+                fontWeight: 600,
+                fontSize: "1.05rem",
+                color: "var(--text-primary)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                outline: "none",
+                listStyle: "none"
+              }}>
+                {faq.q}
+                <span style={{ color: "var(--accent)", fontSize: "1.25rem" }}>+</span>
+              </summary>
+              <p style={{
+                marginTop: "1rem",
+                color: "var(--text-secondary)",
+                lineHeight: 1.6,
+                fontSize: "0.9375rem",
+                cursor: "default"
+              }}>
+                {faq.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Footer ────────────────────────────────────────────── */}
+      <Footer />
     </div>
   );
 }

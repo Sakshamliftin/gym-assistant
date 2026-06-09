@@ -38,6 +38,8 @@ export default function Navbar() {
             color: "var(--text-primary)",
             textDecoration: "none",
             letterSpacing: "-0.02em",
+            cursor: "pointer",
+            
           }}
         >
           Gym<span style={{ color: "var(--accent)" }}>Buddy</span>
@@ -52,10 +54,10 @@ export default function Navbar() {
           }}
           className="hidden-mobile"
         >
-          <Link href="/#features" style={navLinkStyle}>Features</Link>
-          <Link href="/community" style={navLinkStyle}>Community</Link>
+          <Link href="/#features" className="nav-link">Features</Link>
+          <Link href="/community" className="nav-link">Community</Link>
           {session && (
-            <Link href="/dashboard" style={navLinkStyle}>Dashboard</Link>
+            <Link href="/dashboard" className="nav-link">Dashboard</Link>
           )}
         </div>
 
@@ -96,14 +98,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" style={{
-                padding: "0.5rem 1.25rem",
-                color: "var(--text-secondary)",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s",
-              }}>
+              <Link href="/login" className="nav-link-signin">
                 Sign In
               </Link>
               <Link href="/signup" className="btn-primary" style={{ padding: "0.5rem 1.25rem", fontSize: "0.875rem" }}>
@@ -117,10 +112,3 @@ export default function Navbar() {
   );
 }
 
-const navLinkStyle: React.CSSProperties = {
-  color: "var(--text-secondary)",
-  textDecoration: "none",
-  fontSize: "0.9375rem",
-  fontWeight: 500,
-  transition: "color 0.2s",
-};
