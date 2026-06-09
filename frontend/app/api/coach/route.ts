@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -47,13 +47,36 @@ Based on this context, provide helpful, concise, and safe fitness advice.
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        { role: "user", parts: [{ text: context + "\n\nUser Question: " + message }] }
-      ]
+      model: "gemini-2.5-flash-lite",
+      contents: context + "\n\nUser Question: " + message,
+      config: {
+        // 1. Force the model to output valid JSON
+        responseMimeType: 'application/json',
+        // 2. Define exactly what you want the JSON object to look like
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            reply: {
+              type: Type.STRING,
+              description: "The coach's response to the user, strictly plain text with NO markdown symbols like **, *, or #."
+            },
+            actionItems: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "List of next steps for the user."
+            }
+          },
+          required: ["reply"],
+        },
+      },
     });
-    
-    return NextResponse.json({ reply: response.text });
+
+    if (!response.text) {
+      return NextResponse.json({ error: "No response from AI" }, { status: 500 });
+    }
+
+    const coachData = JSON.parse(response.text);
+    return Response.json(coachData);
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     return NextResponse.json({ error: "Failed to generate AI response." }, { status: 500 });
