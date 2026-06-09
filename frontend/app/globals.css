@@ -3,17 +3,17 @@
 
 /* ── Design Tokens ─────────────────────────────────────────── */
 :root {
-  --bg-base:      #0d0d0f;
-  --bg-surface:   #18181b;
-  --bg-elevated:  #27272a;
-  --border:       #3f3f46;
-  --border-subtle:#27272a;
+  --bg-base:      #f4f4f5;
+  --bg-surface:   #fff;
+  --bg-elevated:  #e4e4e7;
+  --border:       #d4d4d8;
+  --border-subtle:#f4f4f5;
 
   --accent:       #6c63ff;
   --accent-hover: #5b53e8;
   --accent-muted: rgba(108, 99, 255, 0.15);
 
-  --text-primary:   #f4f4f5;
+  --text-primary:   #0d0d0f;
   --text-secondary: #a1a1aa;
   --text-muted:     #71717a;
 

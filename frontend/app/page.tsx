@@ -25,6 +25,16 @@ export default function HomePage() {
           overflow: "hidden",
         }}
       >
+         <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      >
+        <source src="/bg-video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
         {/* Background glow blobs */}
         <div
           aria-hidden
@@ -63,7 +73,7 @@ export default function HomePage() {
               letterSpacing: "0.04em", textTransform: "uppercase",
             }}
           >
-            <span>⚡</span> AI-powered fitness platform
+            
           </div>
 
           {/* Headline */}
@@ -72,7 +82,7 @@ export default function HomePage() {
             style={{
               fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 900,
               lineHeight: 1.1, letterSpacing: "-0.03em",
-              color: "var(--text-primary)", marginBottom: "1.5rem",
+              color: "#fff", marginBottom: "1.5rem",
             }}
           >
             Train smarter.{" "}
