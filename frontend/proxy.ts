@@ -1,0 +1,33 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+
+export async function proxy(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  const { pathname } = request.nextUrl;
+
+  // Protected routes — redirect to /login if not authenticated
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
+    if (!token) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Auth routes — redirect to /dashboard if already authenticated
+  if (pathname === "/login" || pathname === "/signup") {
+    if (token) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/login", "/signup"],
+};

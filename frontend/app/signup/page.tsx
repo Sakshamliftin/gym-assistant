@@ -1,11 +1,12 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,6 +18,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
+    // For now, try to sign in with demo credentials
+    // Real registration will be wired in Milestone 2 with Prisma
     const result = await signIn("credentials", {
       redirect: false,
       email,
@@ -26,9 +29,11 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password. Try saksham@gmail.com / 1234");
+      setError(
+        "Registration is not available yet — use the demo account: saksham@gmail.com / 1234"
+      );
     } else {
-      router.push("/dashboard");
+      router.push("/onboarding");
       router.refresh();
     }
   };
@@ -39,7 +44,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-1">Gym Buddy</h1>
-          <p className="text-gray-400 text-sm">Sign in to your account</p>
+          <p className="text-gray-400 text-sm">Create your account</p>
         </div>
 
         {/* Card */}
@@ -53,10 +58,25 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
+                Name
+              </label>
+              <input
+                id="signup-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="Your name"
+                className="w-full px-4 py-3 rounded-lg bg-[#27272a] border border-[#3f3f46] text-white placeholder-gray-500 focus:outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff] transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email
               </label>
               <input
-                id="email"
+                id="signup-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -71,33 +91,34 @@ export default function LoginPage() {
                 Password
               </label>
               <input
-                id="password"
+                id="signup-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="••••••••"
+                minLength={6}
+                placeholder="At least 6 characters"
                 className="w-full px-4 py-3 rounded-lg bg-[#27272a] border border-[#3f3f46] text-white placeholder-gray-500 focus:outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff] transition"
               />
             </div>
 
             <button
-              id="login-submit"
+              id="signup-submit"
               type="submit"
               disabled={loading}
               className="w-full py-3 px-4 rounded-lg bg-[#6c63ff] hover:bg-[#5b53e8] text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? "Creating account…" : "Create Account"}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/signup"
+              href="/login"
               className="text-[#6c63ff] hover:text-[#8b85ff] font-medium transition"
             >
-              Create one
+              Sign in
             </Link>
           </p>
         </div>

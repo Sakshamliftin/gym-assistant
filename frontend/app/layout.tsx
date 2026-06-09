@@ -1,7 +1,13 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "GymBuddy — Train Smarter, Break PRs",
+  description:
+    "GymBuddy is your AI-powered fitness companion. Log workouts, track PRs, get personalized coaching, and join creator communities.",
+};
 
 export default function RootLayout({
   children,
@@ -10,10 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
+      <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <Providers>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main style={{ flex: 1 }}>{children}</main>
         </Providers>
       </body>
     </html>

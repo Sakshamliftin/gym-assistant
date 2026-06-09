@@ -1,85 +1,209 @@
-import Image from "next/image";
-import AddExerciseButton from "@/components/AddExerciseButton";
-import Footer from "@/components/Footer";
+import Link from "next/link";
+import FeaturesGrid from "@/components/FeaturesGrid";
 
-import Carousel from "@/components/Carousel";
-export default function Home() {
+const stats = [
+  { value: "10k+", label: "Workouts logged" },
+  { value: "500+", label: "Active athletes" },
+  { value: "98%", label: "PR detection accuracy" },
+  { value: "24/7", label: "AI coach availability" },
+];
+
+export default function HomePage() {
   return (
-    <main>
-      <header className="text-xl m-4 "> GYM BUDDY</header>
-      <Carousel />
+    <div style={{ background: "var(--bg-base)" }}>
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <section
+        style={{
+          minHeight: "calc(100vh - 64px)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "5rem 1.5rem 4rem",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Background glow blobs */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            overflow: "hidden",
+          }}
+        >
+          <div style={{
+            position: "absolute", top: "10%", left: "50%",
+            transform: "translateX(-50%)", width: "700px", height: "700px",
+            background: "radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%)",
+            borderRadius: "50%",
+          }} />
+          <div style={{
+            position: "absolute", bottom: "5%", left: "10%",
+            width: "400px", height: "400px",
+            background: "radial-gradient(circle, rgba(96,165,250,0.07) 0%, transparent 70%)",
+            borderRadius: "50%",
+          }} />
+        </div>
 
-      <p className="my-10 px-4 mx-5">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quibusdam
-        eligendi mollitia et aspernatur dolores, impedit reprehenderit magni
-        deserunt fugiat. Dicta quasi, id delectus quidem, temporibus sint quam
-        eum, aliquid assumenda nesciunt porro impedit eius ipsa nam illum
-        eligendi qui eos numquam. Iure ratione voluptates, maxime eligendi
-        veniam quam earum qui odit a ea in esse iste veritatis. Exercitationem
-        autem atque cumque itaque, cupiditate a. Delectus quae ullam eligendi
-        eos perspiciatis aut vel nostrum explicabo rerum nemo quod provident
-        dolorem, veritatis, animi ratione officia tenetur dolor, obcaecati
-        debitis commodi cupiditate deserunt voluptas necessitatibus dignissimos.
-        Accusantium nemo, officia animi ullam dolor aliquam. Lorem ipsum dolor
-        sit amet consectetur adipisicing elit. Totam iste maxime quidem beatae
-        et iusto soluta deserunt quisquam nam tempora quasi, eveniet fugiat
-        vitae doloremque ab animi dolor inventore magnam aliquam nulla esse a
-        nemo reiciendis. Voluptatum repudiandae exercitationem ipsam amet alias
-        optio laborum voluptate excepturi dolore molestias explicabo rerum
-        magnam consequatur fugit omnis atque deserunt odio perferendis non
-        aperiam illo, asperiores minus! Debitis porro est, similique doloribus
-        provident necessitatibus fuga vitae officiis ipsa repudiandae. Quaerat
-        sed, necessitatibus aperiam sunt suscipit modi est neque assumenda
-        adipisci repellat rem nostrum dolore, doloremque vel ipsa sapiente totam
-        iste aliquid maxime! Nulla odio quaerat minima eos placeat ratione! Ipsa
-        enim praesentium ad obcaecati ea consectetur, debitis aperiam, ducimus
-        sint quidem, doloremque fuga repellendus non numquam libero eveniet
-        distinctio quod! Nobis earum corporis maiores ullam tenetur, porro
-        voluptatibus! Minus eos mollitia ratione sunt adipisci, excepturi
-        pariatur distinctio. Quaerat placeat fugit nesciunt accusamus magnam
-        ullam quod iste mollitia? Modi et perferendis, dolor pariatur voluptas
-        reiciendis quisquam rem! Excepturi accusamus impedit eaque repellat.
-        Autem qui odio blanditiis soluta sapiente a officia possimus, tempora
-        cupiditate cum earum repudiandae iure laudantium aliquam aliquid
-        suscipit quia provident quibusdam nemo quisquam quo! Accusantium
-        voluptatibus saepe iusto suscipit quidem accusamus quia optio minima
-        pariatur repudiandae, nesciunt voluptatum iste voluptate numquam
-        reiciendis eos hic mollitia odio eum. Repellendus libero minima totam
-        praesentium porro vel nobis enim ad eum dolorem, vitae, itaque illum
-        adipisci cupiditate aliquid explicabo, necessitatibus pariatur! Quos
-        rerum ad eius! Distinctio, vel cupiditate exercitationem, asperiores
-        animi delectus assumenda maiores eius harum laudantium fugiat
-        consequatur culpa obcaecati eaque. Est aperiam possimus veritatis ea
-        eligendi officiis quaerat consequuntur, architecto nostrum fugit, eius
-        molestiae dolor odio. Autem quod pariatur qui necessitatibus fugiat
-        illum libero! Voluptatum at assumenda tempore aut reprehenderit
-        consectetur enim pariatur eum expedita quasi praesentium, dolor
-        explicabo dignissimos odit veritatis, repellat unde itaque ab? Voluptas
-        fuga quidem earum doloribus illo voluptates vero debitis distinctio
-        officiis, nobis excepturi nulla labore mollitia laborum ab deleniti
-        voluptatem rem ipsa! Impedit, quaerat repudiandae! Quas ipsa quaerat
-        accusantium, harum nam aliquid ex fugiat ut porro repellendus sequi
-        officia eos, maxime possimus sunt suscipit facere culpa? Adipisci
-        perferendis mollitia illo. Dolorem enim iusto, est distinctio voluptates
-        excepturi nam repellendus incidunt laboriosam error, eius vel rem nisi
-        culpa? Est ea doloribus repellat repudiandae doloremque ipsam maiores.
-        Vel, repudiandae. Nesciunt placeat ut, asperiores pariatur explicabo
-        eius mollitia quasi vel debitis expedita quod officia qui, eum eaque
-        nobis ea deserunt optio deleniti architecto dignissimos aspernatur
-        voluptate perspiciatis et minima. Veniam accusamus atque est
-        reprehenderit, pariatur facere nulla, quidem quae praesentium itaque at
-        ratione consectetur adipisci. Nostrum neque architecto illo dolor veniam
-        est rem molestias tempora eligendi esse mollitia sapiente libero,
-        dignissimos itaque eaque, officiis reprehenderit consequuntur ipsa quia
-        cumque quasi voluptatibus! Quaerat pariatur non illum adipisci autem?
-        Doloribus facilis asperiores beatae quidem atque at iure a earum magni
-        amet vitae officiis fugiat molestias, voluptate optio quae accusantium
-        pariatur rem est. Alias, labore facere enim debitis beatae doloribus
-        sequi id, soluta cumque fugit quas rerum officia laborum. Atque corporis
-        animi ducimus!
-      </p>
-      <AddExerciseButton />
-      <Footer />
-    </main>
+        <div style={{ maxWidth: "860px", position: "relative" }}>
+          {/* Badge */}
+          <div
+            className="animate-fade-up"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "0.5rem",
+              padding: "0.375rem 1rem",
+              background: "var(--accent-muted)",
+              border: "1px solid rgba(108,99,255,0.3)",
+              borderRadius: "999px", fontSize: "0.8125rem", fontWeight: 600,
+              color: "#a78bfa", marginBottom: "2rem",
+              letterSpacing: "0.04em", textTransform: "uppercase",
+            }}
+          >
+            <span>⚡</span> AI-powered fitness platform
+          </div>
+
+          {/* Headline */}
+          <h1
+            className="animate-fade-up animate-delay-1"
+            style={{
+              fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 900,
+              lineHeight: 1.1, letterSpacing: "-0.03em",
+              color: "var(--text-primary)", marginBottom: "1.5rem",
+            }}
+          >
+            Train smarter.{" "}
+            <span className="gradient-text">Break PRs.</span>
+            <br />
+            Never skip leg day.
+          </h1>
+
+          {/* Sub-headline */}
+          <p
+            className="animate-fade-up animate-delay-2"
+            style={{
+              fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
+              color: "var(--text-secondary)", lineHeight: 1.7,
+              maxWidth: "600px", margin: "0 auto 2.5rem",
+            }}
+          >
+            GymBuddy logs your workouts, surfaces performance insights, and
+            gives you a personalized AI coach that actually knows your training
+            history.
+          </p>
+
+          {/* CTA Buttons */}
+          <div
+            className="animate-fade-up animate-delay-3"
+            style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}
+          >
+            <Link href="/signup" className="btn-primary" id="hero-cta-signup">
+              Start for free →
+            </Link>
+            <Link href="/login" className="btn-secondary" id="hero-cta-login">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ─────────────────────────────────────────── */}
+      <section style={{
+        borderTop: "1px solid var(--border-subtle)",
+        borderBottom: "1px solid var(--border-subtle)",
+        padding: "2.5rem 1.5rem",
+        background: "var(--bg-surface)",
+      }}>
+        <div style={{
+          maxWidth: "1000px", margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: "2rem", textAlign: "center",
+        }}>
+          {stats.map((s) => (
+            <div key={s.label}>
+              <div style={{
+                fontSize: "2.25rem", fontWeight: 800,
+                color: "var(--accent)", letterSpacing: "-0.02em",
+              }}>
+                {s.value}
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: "0.25rem" }}>
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Features ──────────────────────────────────────────── */}
+      <section id="features" style={{ padding: "6rem 1.5rem", maxWidth: "1200px", margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <h2 style={{
+            fontSize: "clamp(1.75rem, 4vw, 2.75rem)", fontWeight: 800,
+            letterSpacing: "-0.02em", color: "var(--text-primary)", marginBottom: "1rem",
+          }}>
+            Everything you need to{" "}
+            <span className="gradient-text">level up</span>
+          </h2>
+          <p style={{ color: "var(--text-secondary)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+            From the first rep to the championship podium — GymBuddy has the
+            tools, data, and intelligence to get you there.
+          </p>
+        </div>
+
+        {/* Client component handles hover interactivity */}
+        <FeaturesGrid />
+      </section>
+
+      {/* ── CTA Banner ────────────────────────────────────────── */}
+      <section style={{
+        padding: "5rem 1.5rem", textAlign: "center",
+        background: "var(--bg-surface)",
+        borderTop: "1px solid var(--border-subtle)",
+      }}>
+        <div style={{ maxWidth: "620px", margin: "0 auto" }}>
+          <h2 style={{
+            fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 800,
+            letterSpacing: "-0.02em", color: "var(--text-primary)", marginBottom: "1rem",
+          }}>
+            Ready to train like you mean it?
+          </h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "2rem", lineHeight: 1.7 }}>
+            Join hundreds of athletes already using GymBuddy to track progress,
+            break PRs, and train with purpose.
+          </p>
+          <Link href="/signup" className="btn-primary" id="bottom-cta-signup">
+            Get started free →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Footer ────────────────────────────────────────────── */}
+      <footer style={{
+        borderTop: "1px solid var(--border-subtle)",
+        padding: "2rem 1.5rem", textAlign: "center",
+        color: "var(--text-muted)", fontSize: "0.875rem",
+      }}>
+        <div style={{
+          maxWidth: "1200px", margin: "0 auto",
+          display: "flex", justifyContent: "space-between",
+          alignItems: "center", flexWrap: "wrap", gap: "1rem",
+        }}>
+          <span>
+            <strong style={{ color: "var(--text-secondary)" }}>GymBuddy</strong> — Train smarter.
+          </span>
+          <div style={{ display: "flex", gap: "1.5rem" }}>
+            <Link href="/login" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Login</Link>
+            <Link href="/signup" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Sign Up</Link>
+            <Link href="/#features" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Features</Link>
+          </div>
+          <span>© 2026 GymBuddy</span>
+        </div>
+      </footer>
+    </div>
   );
 }
