@@ -7,7 +7,7 @@ export default function ActiveWorkoutPage() {
   const { id } = useParams() as { id: string };
   const [workout, setWorkout] = useState<any>(null);
   const [newExercise, setNewExercise] = useState("");
-  
+
   // Set logging states
   const [reps, setReps] = useState("");
   const [weight, setWeight] = useState("");
@@ -58,23 +58,36 @@ export default function ActiveWorkoutPage() {
   return (
     <div style={{ padding: "2rem" }}>
       <h1>{workout.name}</h1>
-      
+
       <form onSubmit={addExercise} style={{ margin: "1rem 0" }}>
-        <input 
-          type="text" 
-          placeholder="Add Exercise (e.g. Bench Press)" 
-          value={newExercise} 
-          onChange={(e) => setNewExercise(e.target.value)} 
-          required 
+        <input
+          type="text"
+          placeholder="Add Exercise (e.g. Bench Press)"
+          value={newExercise}
+          onChange={(e) => setNewExercise(e.target.value)}
+          required
+          className="border-2"
         />
-        <button type="submit">Add</button>
+        <button
+          type="submit"
+          className="border rounded m-1 p-2 px-4 bg-green-500 cursor-pointer"
+        >
+          Add
+        </button>
       </form>
 
       <div>
         {workout.exercises.map((we: any) => (
-          <div key={we.id} style={{ border: "1px solid #ccc", padding: "1rem", margin: "1rem 0" }}>
+          <div
+            key={we.id}
+            style={{
+              border: "1px solid #ccc",
+              padding: "1rem",
+              margin: "1rem 0",
+            }}
+          >
             <h3>{we.exercise.name}</h3>
-            
+
             <ul style={{ margin: "0.5rem 0" }}>
               {we.sets.map((s: any, idx: number) => (
                 <li key={s.id}>
@@ -84,14 +97,51 @@ export default function ActiveWorkoutPage() {
             </ul>
 
             {activeExerciseId === we.id ? (
-              <form onSubmit={(e) => logSet(e, we.id)} style={{ marginTop: "0.5rem" }}>
-                <input type="number" placeholder="Reps" value={reps} onChange={(e) => setReps(e.target.value)} required style={{ width: "60px", marginRight: "0.5rem" }}/>
-                <input type="number" placeholder="Weight (kg)" value={weight} onChange={(e) => setWeight(e.target.value)} required style={{ width: "80px", marginRight: "0.5rem" }}/>
-                <button type="submit">Save Set</button>
-                <button type="button" onClick={() => setActiveExerciseId(null)}>Cancel</button>
+              <form
+                onSubmit={(e) => logSet(e, we.id)}
+                style={{ marginTop: "0.5rem" }}
+              >
+                <input
+                  type="number"
+                  placeholder="Reps"
+                  value={reps}
+                  onChange={(e) => setReps(e.target.value)}
+                  required
+                  style={{
+                    width: "60px",
+                    marginRight: "0.5rem",
+                    border: "2px bold black",
+                  }}
+                />
+                <input
+                  type="number"
+                  placeholder="Weight (kg)"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  required
+                  style={{ width: "80px", marginRight: "0.5rem" }}
+                />
+                <button
+                  type="submit"
+                  className="border-2 rounded bg-green-400 cursor-pointer m-1 p-2"
+                >
+                  Save Set
+                </button>
+                <button
+                  type="button"
+                  className="border-2 rounded bg-red-400 cursor-pointer m-1 p-2"
+                  onClick={() => setActiveExerciseId(null)}
+                >
+                  Cancel
+                </button>
               </form>
             ) : (
-              <button onClick={() => setActiveExerciseId(we.id)}>+ Log Set</button>
+              <button
+                onClick={() => setActiveExerciseId(we.id)}
+                className="border-2 rounded px-2 cursor-pointer bg-blue-500"
+              >
+                + Log Set
+              </button>
             )}
           </div>
         ))}
