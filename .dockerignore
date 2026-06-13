@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.gitignore
+.gitignore.root-backup
+Dockerfile
+docker-compose.yml
+README.root-backup.md
+npm-debug.log*
+*.log
+.env
+.env.local
+prisma/dev.db
