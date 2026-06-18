@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,11 +27,24 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password. If you don't have an account, please sign up first.");
+      setError(
+        "Invalid email or password. If you don't have an account, please sign up first.",
+      );
     } else {
       router.push("/dashboard");
       router.refresh();
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setGoogleLoading(true);
+
+    await signIn("google", {
+      callbackUrl: "/dashboard",
+    });
+
+    setGoogleLoading(false);
   };
 
   return (
@@ -90,6 +104,23 @@ export default function LoginPage() {
               {loading ? "Signing in…" : "Sign In"}
             </button>
           </form>
+
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[#27272a]" />
+            <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
+              or
+            </span>
+            <div className="h-px flex-1 bg-[#27272a]" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading || loading}
+            className="w-full py-3 px-4 rounded-lg bg-white text-[#0d0d0f] font-semibold transition hover:bg-gray-100 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {googleLoading ? "Redirecting…" : "Continue with Google"}
+          </button>
 
           <p className="mt-6 text-center text-sm text-gray-500">
             Don&apos;t have an account?{" "}
