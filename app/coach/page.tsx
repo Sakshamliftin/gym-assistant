@@ -18,6 +18,13 @@ export default function CoachPage() {
     if (!message.trim()) return;
 
     const userMessage = message;
+    const conversationHistory = chatLog
+      .filter((entry) => entry.role !== "error")
+      .slice(-6)
+      .map(
+        (entry) => `${entry.role === "user" ? "User" : "Coach"}: ${entry.text}`,
+      );
+
     setChatLog((prev) => [...prev, { role: "user", text: userMessage }]);
     setMessage("");
     setLoading(true);
@@ -26,7 +33,7 @@ export default function CoachPage() {
       const res = await fetch("/api/coach", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, conversationHistory }),
       });
       const data = await res.json();
 

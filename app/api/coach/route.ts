@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { message } = await req.json();
+  const { message, conversationHistory = [] } = await req.json();
 
   if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
     return NextResponse.json({ error: "Gemini API key is missing or invalid." }, { status: 500 });
@@ -60,10 +60,17 @@ Kindly let them know that to give personalised advice, they should complete thei
 You can still answer general fitness questions, but make it clear the advice is generic since you don't know their specific goals or experience.
 `;
 
+  const conversationContext = Array.isArray(conversationHistory) && conversationHistory.length > 0
+    ? `
+Recent Conversation Summary:
+${conversationHistory.slice(-6).map((entry: string) => `- ${entry}`).join("\n")}
+`
+    : "";
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite",
-      contents: context + "\n\nUser Question: " + message,
+      contents: context + conversationContext + "\n\nUser Question: " + message,
       config: {
         // 1. Force the model to output valid JSON
         responseMimeType: 'application/json',
