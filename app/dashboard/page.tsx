@@ -264,6 +264,9 @@ export default async function DashboardPage() {
                 <Link href="/workouts/new" className="btn-primary" style={{ width: "100%", textAlign: "center" }}>
                   🏋️ Start Workout
                 </Link>
+                <Link href="/workouts/generator" className="btn-primary" style={{ width: "100%", textAlign: "center", background: "linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%)" }}>
+                  🤖 AI Routine Generator
+                </Link>
                 <Link href="/coach" className="btn-secondary" style={{ width: "100%", textAlign: "center" }}>
                   🤖 Ask AI Coach
                 </Link>
